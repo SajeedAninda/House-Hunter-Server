@@ -66,6 +66,25 @@ async function run() {
             res.status(200).json({ message: 'Login successful', token });
         });
 
+        // GET USER DATA BY EMAIL 
+        app.get('/userData/:email', async (req, res) => {
+            const userEmail = req.params.email;
+            console.log(userEmail);
+
+            try {
+                const userData = await userCollection.findOne({ email: userEmail });
+
+                if (!userData) {
+                    return res.status(404).json({ message: 'User not found' });
+                }
+
+                res.status(200).json(userData);
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({ message: 'Internal server error' });
+            }
+        });
+
 
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
