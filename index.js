@@ -30,6 +30,7 @@ async function run() {
         // Send a ping to confirm a successful connection
         // await client.db("admin").command({ ping: 1 });
         const userCollection = client.db("HouseHunter").collection("users");
+        const houseCollection = client.db("HouseHunter").collection("houses");
 
         // POST NEW USER DATA TO DATABASE
 
@@ -69,7 +70,6 @@ async function run() {
         // GET USER DATA BY EMAIL 
         app.get('/userData/:email', async (req, res) => {
             const userEmail = req.params.email;
-            console.log(userEmail);
 
             try {
                 const userData = await userCollection.findOne({ email: userEmail });
@@ -84,6 +84,13 @@ async function run() {
                 res.status(500).json({ message: 'Internal server error' });
             }
         });
+
+        // POST HOUSE DATA 
+        app.post("/houses", async (req, res) => {
+            let houseDetails = req.body;
+            let result = await houseCollection.insertOne(houseDetails);
+            res.send(result);
+        })
 
 
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
