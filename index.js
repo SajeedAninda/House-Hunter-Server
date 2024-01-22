@@ -147,6 +147,43 @@ async function run() {
             res.send(result);
         });
 
+        // API TO GET ALL HOUSES 
+        app.get("/allHouses", async (req, res) => {
+            let { rentMin, rentMax, city, bedRooms, bathRoom, minRoomSize, maxRoomSize, searchText } = req.query;
+            let filter = {};
+            
+            console.log(bedRooms, bathRoom);
+
+            if (rentMin && rentMax) {
+                filter.rent = { $gte: parseFloat(rentMin), $lte: parseFloat(rentMax) };
+            }
+
+            if (minRoomSize && maxRoomSize) {
+                filter.roomSize = { $gte: parseFloat(minRoomSize), $lte: parseFloat(maxRoomSize) };
+            }
+
+            if (city && city !== 'allCity') {
+                filter.location = city;
+            }
+
+            if (bedRooms && bedRooms !== 'allRooms') {
+                filter.totalBedrooms = bedRooms;
+            }
+
+            if (bathRoom && bathRoom !== 'allBathRooms') {
+                filter.totalBathrooms = bathRoom;
+            }
+
+            if (searchText) {
+                filter.$or = [
+                    { houseName: { $regex: new RegExp(searchText, 'i') } }
+                ];
+            }
+
+            let result = await houseCollection.find(filter).toArray();
+            res.send(result);
+        })
+
 
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
