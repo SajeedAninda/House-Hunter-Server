@@ -95,7 +95,6 @@ async function run() {
         // API TO GET HOUSES BY SPECIFIC USER 
         app.get("/myHouses", async (req, res) => {
             let ownerEmail = req.query.ownerEmail;
-            console.log(ownerEmail);
 
             if (!ownerEmail) {
                 return res.status(400).json({ error: 'Owner email Not Found' });
@@ -109,6 +108,14 @@ async function run() {
             let id = req.params.id;
             let query = { _id: new ObjectId(id) };
             let result = await houseCollection.deleteOne(query);
+            res.send(result);
+        })
+
+        // GET HOUSE DETAILS BY SPECIFIC HOUSE ID
+        app.get("/houseDetails/:id", async (req, res) => {
+            let id = req.params.id;
+            let query = { _id: new ObjectId(id) };
+            let result = await houseCollection.findOne(query);
             res.send(result);
         })
 
