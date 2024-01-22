@@ -92,6 +92,18 @@ async function run() {
             res.send(result);
         })
 
+        // API TO GET HOUSES BY SPECIFIC USER 
+        app.get("/myHouses", async (req, res) => {
+            let ownerEmail = req.query.ownerEmail;
+            console.log(ownerEmail);
+
+            if (!ownerEmail) {
+                return res.status(400).json({ error: 'Owner email Not Found' });
+            }
+            const result = await houseCollection.find({ ownerEmail }).toArray();
+            res.send(result);
+        });
+
 
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
