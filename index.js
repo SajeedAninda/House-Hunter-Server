@@ -10,7 +10,7 @@ app.use(express.json());
 const port = 5000
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `${process.env.MONGO_URI}`;
 const secretKey = `${process.env.SECRET_KEY}`;
 
@@ -103,6 +103,14 @@ async function run() {
             const result = await houseCollection.find({ ownerEmail }).toArray();
             res.send(result);
         });
+
+        // API TO DELETE HOUSE
+        app.delete("/deleteHouse/:id", async (req, res) => {
+            let id = req.params.id;
+            let query = { _id: new ObjectId(id) };
+            let result = await houseCollection.deleteOne(query);
+            res.send(result);
+        })
 
 
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
