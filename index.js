@@ -45,12 +45,26 @@ async function run() {
 
             let result = await userCollection.insertOne(userData);
 
-            const token = jwt.sign({ userEmail }, secretKey, { expiresIn: '24h' });
+            let token = jwt.sign({ userEmail }, secretKey, { expiresIn: '24h' });
             res.cookie('accessToken', token, { httpOnly: true });
             res.status(200).json({ message: 'User registered successfully', token });
         })
 
-        
+        // API TO LOGIN USERS 
+        app.post("/userLogin", async (req, res) => {
+            let { email, password } = req.body;
+
+            let user = await userCollection.findOne({ email });
+
+            if (!user || user.password !== password) {
+                return res.status(401).json({ message: 'Invalid credentials' });
+            }
+
+            let token = jwt.sign({ email }, secretKey, { expiresIn: '24h' });
+
+            res.cookie('accessToken', token, { httpOnly: true });
+            res.status(200).json({ message: 'Login successful', token });
+        });
 
 
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
