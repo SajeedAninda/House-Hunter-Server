@@ -119,6 +119,34 @@ async function run() {
             res.send(result);
         })
 
+        // API TO UPDATE HOUSE DETAILS 
+        app.patch("/updateHouse/:id", async (req, res) => {
+            const id = req.params.id;
+            const houseDetails = req.body;
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const updatedHouse = {
+                $set: {
+                    houseName: houseDetails.houseName,
+                    address: houseDetails.address,
+                    location: houseDetails.location,
+                    totalBedrooms: houseDetails.totalBedrooms,
+                    totalBathrooms: houseDetails.totalBathrooms,
+                    roomSize: houseDetails.roomSize,
+                    availableDate: houseDetails.availableDate,
+                    rent: houseDetails.rent,
+                    phoneNumber: houseDetails.phoneNumber,
+                    description: houseDetails.description
+                },
+            };
+            const result = await houseCollection.updateOne(
+                filter,
+                updatedHouse,
+                options
+            );
+            res.send(result);
+        });
+
 
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
