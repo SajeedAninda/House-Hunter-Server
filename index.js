@@ -12,6 +12,7 @@ const port = 5000
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = `${process.env.MONGO_URI}`;
+const secretKey = `${process.env.SECRET_KEY}`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -28,6 +29,30 @@ async function run() {
         // await client.connect();
         // Send a ping to confirm a successful connection
         // await client.db("admin").command({ ping: 1 });
+        const userCollection = client.db("HouseHunter").collection("users");
+
+        // POST NEW USER DATA TO DATABASE
+
+        app.post("/userRegister", async (req, res) => {
+            let userData = req.body;
+
+            let userEmail = userData.email;
+            let existingUser = await userCollection.findOne({ email: userEmail });
+
+            if (existingUser) {
+                return res.status(400).json({ message: 'User already exists' });
+            }
+
+            let result = await userCollection.insertOne(userData);
+
+            const token = jwt.sign({ userEmail }, secretKey, { expiresIn: '24h' });
+            res.cookie('accessToken', token, { httpOnly: true });
+            res.status(200).json({ message: 'User registered successfully', token });
+        })
+
+        
+
+
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
         // Ensures that the client will close when you finish/error
