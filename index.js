@@ -5,7 +5,10 @@ require('dotenv').config();
 let jwt = require('jsonwebtoken');
 
 
-app.use(cors());
+app.use(cors({
+    origin: ['https://house-hunter-sajeed.netlify.app', 'http://localhost:5173', 'http://localhost:5174'],
+    credentials: true
+}));
 app.use(express.json());
 let port = 5000
 
