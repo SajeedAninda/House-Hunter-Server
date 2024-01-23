@@ -31,6 +31,7 @@ async function run() {
         // await client.db("admin").command({ ping: 1 });
         const userCollection = client.db("HouseHunter").collection("users");
         const houseCollection = client.db("HouseHunter").collection("houses");
+        const bookingCollections = client.db("HouseHunter").collection("houseBookings");
 
         // POST NEW USER DATA TO DATABASE
 
@@ -189,6 +190,28 @@ async function run() {
             let result = await houseCollection.findOne(query);
             res.send(result);
         })
+
+        // API TO HANDLE HOUSE BOOKINGGS
+        app.post('/houseBookings', async (req, res) => {
+            const existingUserBookings = await bookingCollections.find({
+                bookerEmail: req.body.bookerEmail,
+            }).toArray();
+
+            if (existingUserBookings.length >= 2) {
+                return res.status(400).json({ error: 'Cannot book more than two houses.' });
+            }
+
+            const existingHouseBooking = await bookingCollections.findOne({
+                houseId: req.body.houseId,
+            });
+
+            if (existingHouseBooking) {
+                return res.status(400).json({ error: 'House already booked.' });
+            }
+
+            const result = await bookingCollections.insertOne(req.body);
+            res.send(result);
+        });
 
 
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
