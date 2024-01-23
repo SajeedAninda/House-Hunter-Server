@@ -220,8 +220,13 @@ async function run() {
             res.send(result)
         });
 
-
-
+        // API TO DELETE HOUSE FROM BOOKING LIST
+        app.delete("/deleteBookedHouse/:id", async (req, res) => {
+            let id = req.params.id;
+            let query = { _id: new ObjectId(id) };
+            let result = await bookingCollections.deleteOne(query);
+            res.send(result);
+        })
 
 
 
