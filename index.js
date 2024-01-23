@@ -1,21 +1,21 @@
-const express = require('express')
-const cors = require("cors");
-const app = express();
+let express = require('express')
+let cors = require("cors");
+let app = express();
 require('dotenv').config();
-const jwt = require('jsonwebtoken');
+let jwt = require('jsonwebtoken');
 
 
 app.use(cors());
 app.use(express.json());
-const port = 5000
+let port = 5000
 
 
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-const uri = `${process.env.MONGO_URI}`;
-const secretKey = `${process.env.SECRET_KEY}`;
+let { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+let uri = `${process.env.MONGO_URI}`;
+let secretKey = `${process.env.SECRET_KEY}`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(uri, {
+let client = new MongoClient(uri, {
     serverApi: {
         version: ServerApiVersion.v1,
         strict: true,
@@ -29,9 +29,9 @@ async function run() {
         // await client.connect();
         // Send a ping to confirm a successful connection
         // await client.db("admin").command({ ping: 1 });
-        const userCollection = client.db("HouseHunter").collection("users");
-        const houseCollection = client.db("HouseHunter").collection("houses");
-        const bookingCollections = client.db("HouseHunter").collection("houseBookings");
+        let userCollection = client.db("HouseHunter").collection("users");
+        let houseCollection = client.db("HouseHunter").collection("houses");
+        let bookingCollections = client.db("HouseHunter").collection("houseBookings");
 
         // POST NEW USER DATA TO DATABASE
 
@@ -70,10 +70,10 @@ async function run() {
 
         // GET USER DATA BY EMAIL 
         app.get('/userData/:email', async (req, res) => {
-            const userEmail = req.params.email;
+            let userEmail = req.params.email;
 
             try {
-                const userData = await userCollection.findOne({ email: userEmail });
+                let userData = await userCollection.findOne({ email: userEmail });
 
                 if (!userData) {
                     return res.status(404).json({ message: 'User not found' });
@@ -100,7 +100,7 @@ async function run() {
             if (!ownerEmail) {
                 return res.status(400).json({ error: 'Owner email Not Found' });
             }
-            const result = await houseCollection.find({ ownerEmail }).toArray();
+            let result = await houseCollection.find({ ownerEmail }).toArray();
             res.send(result);
         });
 
@@ -122,11 +122,11 @@ async function run() {
 
         // API TO UPDATE HOUSE DETAILS 
         app.patch("/updateHouse/:id", async (req, res) => {
-            const id = req.params.id;
-            const houseDetails = req.body;
-            const filter = { _id: new ObjectId(id) };
-            const options = { upsert: true };
-            const updatedHouse = {
+            let id = req.params.id;
+            let houseDetails = req.body;
+            let filter = { _id: new ObjectId(id) };
+            let options = { upsert: true };
+            let updatedHouse = {
                 $set: {
                     houseName: houseDetails.houseName,
                     address: houseDetails.address,
@@ -140,7 +140,7 @@ async function run() {
                     description: houseDetails.description
                 },
             };
-            const result = await houseCollection.updateOne(
+            let result = await houseCollection.updateOne(
                 filter,
                 updatedHouse,
                 options
@@ -193,7 +193,7 @@ async function run() {
 
         // API TO HANDLE HOUSE BOOKINGGS
         app.post('/houseBookings', async (req, res) => {
-            const existingUserBookings = await bookingCollections.find({
+            let existingUserBookings = await bookingCollections.find({
                 bookerEmail: req.body.bookerEmail,
             }).toArray();
 
@@ -201,7 +201,7 @@ async function run() {
                 return res.status(400).json({ error: 'Cannot book more than two houses.' });
             }
 
-            const existingHouseBooking = await bookingCollections.findOne({
+            let existingHouseBooking = await bookingCollections.findOne({
                 houseId: req.body.houseId,
             });
 
@@ -209,9 +209,22 @@ async function run() {
                 return res.status(400).json({ error: 'House already booked.' });
             }
 
-            const result = await bookingCollections.insertOne(req.body);
+            let result = await bookingCollections.insertOne(req.body);
             res.send(result);
         });
+
+        // GET CURRENT HOUSE RENTER 
+        app.get('/userHouseBookings', async (req, res) => {
+            let currentUserEmail = req.query.email;
+            let result = await bookingCollections.find({ bookerEmail: currentUserEmail }).toArray();
+            res.send(result)
+        });
+
+
+
+
+
+
 
 
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
