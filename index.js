@@ -151,8 +151,6 @@ async function run() {
         app.get("/allHouses", async (req, res) => {
             let { rentMin, rentMax, city, bedRooms, bathRoom, minRoomSize, maxRoomSize, searchText } = req.query;
             let filter = {};
-            
-            console.log(bedRooms, bathRoom);
 
             if (rentMin && rentMax) {
                 filter.rent = { $gte: parseFloat(rentMin), $lte: parseFloat(rentMax) };
@@ -181,6 +179,14 @@ async function run() {
             }
 
             let result = await houseCollection.find(filter).toArray();
+            res.send(result);
+        })
+
+        // API TO GET SINGLE HOUSE DETAILS 
+        app.get("/houseDetails/:id", async (req, res) => {
+            let id = req.params.id;
+            let query = { _id: new ObjectId(id) };
+            let result = await houseCollection.findOne(query);
             res.send(result);
         })
 
